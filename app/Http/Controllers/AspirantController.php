@@ -3,13 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddAspirantRequest;
-use App\Models\Aspirant;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
+use App\Repositories\AspirantRepositoryInterface;
+
 class AspirantController extends Controller
 {
+	private $aspirantRepository;
+
+	public function __construct(AspirantRepositoryInterface $aspirantRepository)
+    {
+        $this->aspirantRepository = $aspirantRepository;
+    }
+
 	public function index()
 	{
 		try {
@@ -18,10 +26,10 @@ class AspirantController extends Controller
 
 			$aspirants = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($user) {
 				if ($user->role === "agent") {
-					return Aspirant::where('owner', $user->id)->get();
+					return $this->aspirantRepository->getByOwner($user->id);
 				} else {
 					Gate::authorize('viewAny', [User::class, $user->role]);
-					return Aspirant::all();
+					return $this->aspirantRepository->getAll();
 				}
 			});
 
@@ -44,7 +52,7 @@ class AspirantController extends Controller
 
 	public function show($id)
 	{
-		$aspirant = Aspirant::find($id);
+		$aspirant = $this->aspirantRepository->getById($id);
 		if (!$aspirant) {
 			return response()->json([
 				"meta" => [
@@ -68,7 +76,7 @@ class AspirantController extends Controller
 			$user = JWTAuth::parseToken()->authenticate();
 			Gate::authorize('create', [User::class, $user->role]);
 
-			$aspirant = Aspirant::create([
+			$aspirant = $this->aspirantRepository->create([
 				"name" => $request->name,
 				"source" => $request->source,
 				"owner" => $request->owner,
