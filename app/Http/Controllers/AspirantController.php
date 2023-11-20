@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use App\Http\Requests\AddAspirantRequest;
 use App\Models\Aspirant;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
 class AspirantController extends Controller
 {
 	public function index()
@@ -43,12 +41,14 @@ class AspirantController extends Controller
 	}
 
 	public function store(AddAspirantRequest $request){
+		$user = JWTAuth::parseToken()->authenticate();
+
 		$aspirant = Aspirant::create([
 			"name" => $request->name,
 			"source" => $request->source,
 			"owner" => $request->owner,
 			"created_at" => date('Y-m-d h:i:s'),
-			"created_by" => 6,
+			"created_by" => $user->id,
 		]);
 		if($aspirant->save()){
 			return response()->json([
