@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/leads', [AspirantController::class, 'index'])->name('aspirants.index');
+Route::get('/leads/{id}', [AspirantController::class, 'show'])->name('aspirants.show');
