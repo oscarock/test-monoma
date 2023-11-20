@@ -9,12 +9,8 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-	public function __construct()
-	{
-		$this->middleware('auth:api', ['except' => ['authenticate']]);
-	}
 	public function authenticate(Request $request)
-  {
+	{
     $credentials = $request->only('username', 'password');
 		try {
 			if (!Auth::attempt($credentials)) {

@@ -17,6 +17,9 @@ class CustomJwtMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         try {
+            if ($request->is('api/auth')) {
+                return $next($request);
+            }
             $user = JWTAuth::parseToken()->authenticate();
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json([
