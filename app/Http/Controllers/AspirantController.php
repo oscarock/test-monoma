@@ -33,20 +33,9 @@ class AspirantController extends Controller
 				}
 			});
 
-			return response()->json([
-				"meta" => [
-					'success' => true,
-					'errors' => []
-				],
-				"data" => $aspirants
-			]);
+			return $this->jsonResponse(true, $aspirants);
 		} catch (\Exception $e) {
-			return response()->json([
-				"meta" => [
-					'success' => false,
-					'errors' => 'Profile not authorized to perform this action'
-				],
-			], 401);
+			return $this->jsonResponse(false, null, ['Profile not authorized to perform this action'], 401);
 		}
 	}
 
@@ -54,20 +43,9 @@ class AspirantController extends Controller
 	{
 		$aspirant = $this->aspirantRepository->getById($id);
 		if (!$aspirant) {
-			return response()->json([
-				"meta" => [
-					'success' => false,
-					'errors' => 'No lead found'
-				],
-			], 404);
+			return $this->jsonResponse(false, null, ['No lead found'], 404);
 		}else{
-			return response()->json([
-				"meta" => [
-					'success' => true,
-					'errors' => []
-				],
-				"data" => $aspirant
-			]);
+			return $this->jsonResponse(true, $aspirant);
 		}
 	}
 
@@ -84,21 +62,21 @@ class AspirantController extends Controller
 				"created_by" => $user->id,
 			]);
 			if($aspirant->save()){
-				return response()->json([
-					"meta" => [
-						'success' => true,
-						'errors' => []
-					],
-					"data" => $aspirant
-				], 201);
+				return $this->jsonResponse(true, $aspirant);
 			}
 		} catch (\Exception $e) {
-			return response()->json([
-				"meta" => [
-					'success' => false,
-					'errors' => 'Profile not authorized to perform this action'
-				],
-			], 401);
+			return $this->jsonResponse(false, null, ['Profile not authorized to perform this action'], 401);
 		}
+	}
+
+	private function jsonResponse($success, $data = null, $errors = [], $statusCode = 200)
+	{
+		return response()->json([
+			"meta" => [
+				'success' => $success,
+				'errors' => $errors
+			],
+			"data" => $data
+		], $statusCode);
 	}
 }
