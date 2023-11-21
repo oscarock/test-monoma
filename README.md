@@ -6,6 +6,7 @@ Se desarrollo en laravel version 10
 
 - Clonar el repositorio
 - Ubicar la rama master
+- Ejecutar el comando ```composer install```
 - En el archivo .env configurar la conexion de la base de datos
 - Ejecutar el comando ```php artisan migrate --seed``` para crear las migraciones y los seed
 - ejecutar el comando ```php artisan jwt:secret``` para generar el secreto del jwt
